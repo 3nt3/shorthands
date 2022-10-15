@@ -26,7 +26,7 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     match read_shorthands() {
         Ok(shorthands) => match shorthands.iter().find(|&x| x.short == subdomain) {
             Some(shorthand) => HttpResponseBuilder::new(StatusCode::FOUND)
-                .insert_header(("Location", "TODO"))
+                .insert_header(("Location", shorthand.long.clone()))
                 .body(format!("redirecting to: {}", shorthand.long)),
             None => HttpResponseBuilder::new(StatusCode::NOT_FOUND).body("not found"),
         },
