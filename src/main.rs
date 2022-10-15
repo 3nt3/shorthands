@@ -7,7 +7,7 @@ use serde::Deserialize;
 use url::Url;
 
 #[get("/")]
-async fn hello(_req: HttpRequest) -> HttpResponse {
+async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     let host_str = _req.headers().get("host").unwrap().to_str().unwrap();
     println!("host_str: {:?}", host_str);
 
@@ -54,7 +54,7 @@ fn read_shorthands() -> anyhow::Result<Vec<Shorthand>> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello))
+    HttpServer::new(|| App::new().service(handle_everything))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await
