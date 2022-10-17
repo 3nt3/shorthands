@@ -23,7 +23,9 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     match read_shorthands() {
         Ok(shorthands) => {
             if subdomain == "list" {
-                return HttpResponse::Ok().json(shorthands);
+                return HttpResponse::Ok()
+                    .insert_header(("Content-Type", "application/json"))
+                    .json(shorthands);
             }
 
             match shorthands.iter().find(|&x| x.short == subdomain) {
