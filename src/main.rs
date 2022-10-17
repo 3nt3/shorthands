@@ -55,6 +55,11 @@ fn read_shorthands() -> anyhow::Result<Vec<Shorthand>> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    match read_shorthands() {
+        Ok(_) => println!("shorthands seem to exist and are able to be read :)"),
+        Err(err) => panic!("error reading shorthands: {}", err),
+    }
+
     HttpServer::new(|| App::new().service(handle_everything))
         .bind(("127.0.0.1", 8086))?
         .run()
