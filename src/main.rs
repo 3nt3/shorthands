@@ -3,8 +3,7 @@ use std::fs;
 use actix_web::{
     get, http::StatusCode, App, HttpRequest, HttpResponse, HttpResponseBuilder, HttpServer,
 };
-use serde::Deserialize;
-use url::Url;
+use serde::{Deserialize, Serialize};
 
 #[get("/")]
 async fn handle_everything(_req: HttpRequest) -> HttpResponse {
@@ -12,9 +11,6 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     println!("host: {:?}", host);
 
     let domain_parts: Vec<&str> = host.split('.').collect();
-    if domain_parts.len() < 3 {
-        return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).body("no subdomain provided");
-    }
     let subdomain = domain_parts[0];
 
     println!("subdomain: {:?}", subdomain);
@@ -22,6 +18,9 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     match read_shorthands() {
         Ok(shorthands) => {
             println!("{:?}", shorthands);
+            if domain_parts.len() < 3 {
+                return HttpResponse::Ok().json(shorthands);
+            }
             match shorthands.iter().find(|&x| x.short == subdomain) {
                 Some(shorthand) => {
                     println!("redirecting {} to {}", host, shorthand.long);
@@ -40,7 +39,7 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 struct Shorthand {
     short: String,
     long: String,

@@ -874,7 +874,6 @@ dependencies = [
  "anyhow",
  "serde",
  "serde_json",
- "url",
 ]
 
 [[package]]
