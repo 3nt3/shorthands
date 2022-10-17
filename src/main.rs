@@ -54,7 +54,7 @@ fn read_shorthands() -> anyhow::Result<Vec<Shorthand>> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| App::new().service(handle_everything))
-        .bind(("127.0.0.1", 8080))?
+        .bind(("127.0.0.1", 8086))?
         .run()
         .await
 }
