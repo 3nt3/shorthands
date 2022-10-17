@@ -8,12 +8,8 @@ use url::Url;
 
 #[get("/")]
 async fn handle_everything(_req: HttpRequest) -> HttpResponse {
-    let host_str = _req.headers().get("host").unwrap().to_str().unwrap();
-    println!("host_str: {:?}", host_str);
-
-    // not sure if it's really necessary to parse the url but I guess at least the host has to be
-    // valid this way
-    let host = Url::parse(host_str).unwrap().to_string();
+    let host = _req.headers().get("host").unwrap().to_str().unwrap();
+    println!("host: {:?}", host);
 
     let domain_parts: Vec<&str> = host.split('.').collect();
     if domain_parts.len() < 3 {
@@ -25,9 +21,12 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
 
     match read_shorthands() {
         Ok(shorthands) => match shorthands.iter().find(|&x| x.short == subdomain) {
-            Some(shorthand) => HttpResponseBuilder::new(StatusCode::FOUND)
-                .insert_header(("Location", shorthand.long.clone()))
-                .body(format!("redirecting to: {}", shorthand.long)),
+            Some(shorthand) => {
+                println!("redirecting {} to {}", host, shorthand.long);
+                return HttpResponseBuilder::new(StatusCode::FOUND)
+                    .insert_header(("Location", shorthand.long.clone()))
+                    .body(format!("redirecting to: {}", shorthand.long));
+            }
             None => HttpResponseBuilder::new(StatusCode::NOT_FOUND).body("not found"),
         },
         Err(err) => {
