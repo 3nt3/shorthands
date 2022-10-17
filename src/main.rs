@@ -20,15 +20,18 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     println!("subdomain: {:?}", subdomain);
 
     match read_shorthands() {
-        Ok(shorthands) => match shorthands.iter().find(|&x| x.short == subdomain) {
-            Some(shorthand) => {
-                println!("redirecting {} to {}", host, shorthand.long);
-                return HttpResponseBuilder::new(StatusCode::FOUND)
-                    .insert_header(("Location", shorthand.long.clone()))
-                    .body(format!("redirecting to: {}", shorthand.long));
+        Ok(shorthands) => {
+            println!("{:?}", shorthands);
+            match shorthands.iter().find(|&x| x.short == subdomain) {
+                Some(shorthand) => {
+                    println!("redirecting {} to {}", host, shorthand.long);
+                    return HttpResponseBuilder::new(StatusCode::FOUND)
+                        .insert_header(("Location", shorthand.long.clone()))
+                        .body(format!("redirecting to: {}", shorthand.long));
+                }
+                None => HttpResponseBuilder::new(StatusCode::NOT_FOUND).body("not found"),
             }
-            None => HttpResponseBuilder::new(StatusCode::NOT_FOUND).body("not found"),
-        },
+        }
         Err(err) => {
             println!("failed getting shorthands: {err}");
             return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR)
@@ -37,7 +40,7 @@ async fn handle_everything(_req: HttpRequest) -> HttpResponse {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct Shorthand {
     short: String,
     long: String,
